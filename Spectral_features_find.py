@@ -55,23 +55,25 @@ def compute_instfreq_and_entropy(data, fs=360, n_windows=524):
         # 2. Spectral Entropy
         spec_entropy = entropy(Sxx_norm, base=2, axis=0)
 
+        # Trim or pad to exactly 524 windows
+        instfreq = instfreq[:524]
+        spec_entropy = spec_entropy[:524]
+
         instfreq_all.append(inst_freq)
         pentropy_all.append(spec_entropy)
 
-    return np.array(instfreq_all), np.array(pentropy_all), t
+    instfreq_all = np.array(instfreq_all)
+    pentropy_all = np.array(pentropy_all)
+    combined_features = np.stack((instfreq_all, pentropy_all), axis=2)  # shape: (samples, 524, 2)
+
+    return combined_features, t[:524]
 
 
 
 loaded = np.load("ECG_samples.npy")
-instfreqs, pentropies, times = compute_instfreq_and_entropy(loaded, fs=360)
+features, time_axis = compute_fixed_instfreq_entropy(loaded)
 
-print("instfreqs shape:", instfreqs.shape)  # (16, 524)
-print("pentropies shape:", pentropies.shape)
-
-# Stack along the last axis (feature axis)
-combined_features = np.stack((instfreqs, pentropies), axis=2)
-
-print("Combined shape:", combined_features.shape)  # (16, 524, 2)
+print(features.shape)  # (16, 524, 2)
 
 
 import matplotlib.pyplot as plt
