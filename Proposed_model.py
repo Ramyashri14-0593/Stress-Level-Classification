@@ -58,9 +58,9 @@ def prepare_data(rr_data, spec_data, labels, num_classes=3):
     y = to_categorical(Labels, num_classes=num_classes)
     return [x1, x2], y
 
-
+loaded_Labels = np.load("Labels.npy")
 # Prepare
-X, Y = prepare_data(rr_features, combined_features, Labels)    
+X, Y = prepare_data(rr_features, combined_features, loaded_Labels)    
 
 # Build & Train
 model = build_model()
