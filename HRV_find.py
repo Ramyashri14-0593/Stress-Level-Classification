@@ -41,3 +41,11 @@ def compute_rr_all(ecg_data, fs=360, rr_length=80, peak_height=0.3):
 
 loaded = np.load("ECG_samples.npy")
 rr_features = compute_rr_all(loaded)
+
+import matplotlib.pyplot as plt
+plt.plot(rr_features[0])
+plt.title("Normalized RR Intervals (One ECG Sample)")
+plt.xlabel("Beat Index")
+plt.ylabel("RR Interval (ms)")
+plt.grid(True)
+plt.show()
