@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Apr  8 2025
+
+@author: Ramyashri Ramteke
+"""
+
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Input, LSTM, Bidirectional, Dense, Concatenate, Layer
