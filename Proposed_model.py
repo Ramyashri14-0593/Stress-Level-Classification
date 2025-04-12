@@ -69,7 +69,7 @@ model.summary()
 earlystop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
 reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5,
                               patience=3, mode='min')
-history=model.fit(X, Y, epochs=10, batch_size=2, callbacks=[earlystop, reduce_lr], validation_split=0.15)
+history=model.fit(X, Y, epochs=500, batch_size=64, callbacks=[earlystop, reduce_lr], validation_split=0.15)
 
 print('Training complete...\n')    
 
