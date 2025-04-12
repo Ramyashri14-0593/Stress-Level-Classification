@@ -48,7 +48,7 @@ def build_model(hidden_units=32):
     output = Dense(3, activation='softmax')(merged)
 
     model = Model(inputs=[input1, input2], outputs=output)
-    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    model.compile(optimizer='adam', loss='loss_fn', metrics=['accuracy'])
     return model
 
 # ---- Data Preprocessing Function ----
