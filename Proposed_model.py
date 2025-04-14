@@ -69,6 +69,20 @@ loaded_Labels = np.load("labels.npy")
 # Prepare
 X, Y = prepare_data(rr_features, combined_features, loaded_Labels)    
 
+# Step 2: First split test set (70 samples)
+X_zipped = list(zip(X[0], X[1]))  # zip rr and spec together for joint splitting
+X_temp, X_test, Y_temp, Y_test = train_test_split(
+    X_zipped, Y, test_size=70, random_state=42, stratify=loaded_Labels)
+
+# Step 3: Split validation set (69 samples)
+X_train_zipped, X_val_zipped, Y_train, Y_val = train_test_split(
+    X_temp, Y_temp, test_size=69, random_state=42, stratify=np.argmax(Y_temp, axis=1))
+
+# Step 4: Unzip the tuples back into separate arrays
+X_train = [np.array([x[0] for x in X_train_zipped]), np.array([x[1] for x in X_train_zipped])]
+X_val   = [np.array([x[0] for x in X_val_zipped]),   np.array([x[1] for x in X_val_zipped])]
+X_test  = [np.array([x[0] for x in X_test]),         np.array([x[1] for x in X_test])]
+
 # Build & Train
 model = build_model()
 model.summary()
@@ -76,7 +90,41 @@ model.summary()
 earlystop = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
 reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5,
                               patience=3, mode='min')
-history=model.fit(X, Y, epochs=500, batch_size=64, callbacks=[earlystop, reduce_lr], validation_split=0.15)
+history=model.fit(X_train, Y_train, validation_data=(X_val, Y_val), epochs=500, batch_size=64, callbacks=[earlystop, reduce_lr])
+
+
+# Evaluate the model on test data
+test_loss, test_accuracy = model.evaluate(X_test, Y_test, verbose=1)
+
+# Print results
+print(f"Test Loss: {test_loss:.4f}")
+print(f"Test Accuracy: {test_accuracy:.4f}")
 
 print('Training complete...\n')    
 
+import matplotlib.pyplot as plt
+
+# Plot training & validation accuracy
+plt.figure(figsize=(12, 5))
+
+plt.subplot(1, 2, 1)
+plt.plot(history.history['accuracy'], label='train')
+plt.plot(history.history['val_accuracy'], label='val')
+plt.title('model accuracy')
+plt.xlabel('epoch')
+plt.ylabel('accuracy')
+plt.legend()
+plt.grid(True)
+
+# Plot training & validation loss
+plt.subplot(1, 2, 2)
+plt.plot(history.history['loss'], label='train')
+plt.plot(history.history['val_loss'], label='val')
+plt.title('model Loss')
+plt.xlabel('epoch')
+plt.ylabel('loss')
+plt.legend()
+plt.grid(True)
+
+plt.tight_layout()
+plt.show()
